@@ -20,7 +20,7 @@ export default function Sidebar({
             <span className="text-xl animate-bounce">⚡</span>
           </div>
           <div>
-            <h2 className="font-bold text-lg tracking-wide text-emerald-400">Supabase RAG Portal</h2>
+            <h2 className="font-bold text-lg tracking-wide text-emerald-400">Appwrite  RAG Portal</h2>
             <p className="text-xs text-slate-400">Secure Document Intelligence</p>
           </div>
         </div>
@@ -113,7 +113,7 @@ export default function Sidebar({
       <div className="pt-6 border-t border-slate-800/80">
         <div className="flex items-center space-x-2 text-[11px] text-slate-400 bg-slate-800/50 p-3 rounded-xl border border-slate-800">
           <span className="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-ping" />
-          <span className="truncate">Supabase pgvector & Ollama Connected</span>
+          <span className="truncate">Appwrite pgvector & Ollama Connected</span>
         </div>
       </div>
     </aside>
