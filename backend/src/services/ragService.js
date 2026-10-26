@@ -1,5 +1,5 @@
 import { tablesDB, DATABASE_ID, TABLE_ID } from '../config/appwrite.js';
-import { Query } from 'node-appwrite'; // <-- Direct node-appwrite se import kiya
+import { Query } from 'node-appwrite';
 import axios from 'axios';
 
 const generateEmbedding = async (text) => {
@@ -10,7 +10,6 @@ const generateEmbedding = async (text) => {
   return response.data.embedding;
 };
 
-// Cosine similarity calculation helper
 const cosineSimilarity = (vecA, vecB) => {
   let dotProduct = 0;
   let normA = 0;
@@ -27,15 +26,14 @@ export const ragService = {
   async queryDocuments(question, selectedFile = "All") {
     const queryEmbedding = await generateEmbedding(question);
 
-    // Fetch documents from Appwrite Table using tablesDB with Query limit
+    // Increased limit to 5000 to cover all document chunks across files
     const response = await tablesDB.listRows({
       databaseId: DATABASE_ID,
       tableId: TABLE_ID,
-      queries: [Query.limit(100)]
+      queries: [Query.limit(5000)]
     });
     let docs = response.rows || [];
 
-    // Filter by specific file if requested and not "All" / "Search Across All Files"
     if (selectedFile && selectedFile !== "All" && selectedFile !== "Search Across All Files") {
       docs = docs.filter(item => item.file_name === selectedFile);
     }
@@ -47,18 +45,15 @@ export const ragService = {
       };
     }
 
-    // Compute similarity scores
     const scoredDocs = docs.map(doc => {
       const docEmbedding = JSON.parse(doc.embedding);
       const similarity = cosineSimilarity(queryEmbedding, docEmbedding);
       return { ...doc, similarity };
     });
 
-    // Sort by highest similarity and take top 3 chunks
     scoredDocs.sort((a, b) => b.similarity - a.similarity);
     const topChunks = scoredDocs.slice(0, 3);
 
-    // Threshold check for strict grounding
     if (topChunks.length === 0 || topChunks[0].similarity < 0.25) {
       return {
         answer: "Mujhe iska jawab uploaded documents me nahi mila.",
@@ -69,7 +64,6 @@ export const ragService = {
     const context = topChunks.map(c => c.content).join("\n\n");
     const sources = [...new Set(topChunks.map(c => c.file_name).filter(Boolean))];
 
-    // Construct prompt for local Ollama LLM
     const prompt = `You are a strict and precise AI Assistant. Answer the user's question using ONLY the provided Context. 
 If the answer is not present in the Context, respond with exact words: "Mujhe iska jawab uploaded documents me nahi mila."
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInput from './components/ChatInput';
+import ChatWindow from './components/Chatwindow';
 import { fetchFilesApi, uploadFilesApi, sendQueryApi } from './controllers/apiService';
 
 function App() {
